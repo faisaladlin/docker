@@ -1,0 +1,70 @@
+#!/bin/sh
+set -e
+
+if [ ! -f artisan ]; then
+
+    # artisan (php file) is missing (in workdir)...
+
+    if [ "${1}" = "init" ]; then
+        
+        # if artisan init command issued...
+
+        printf "\nARTISAN INIT COMMENCING...\n"
+
+        BACKUPDIR=~/backup
+        WORKDIR=$(pwd)
+
+        # ---------------------------------------
+        # backup .env & docker-compose.yml file
+
+        printf "\nBacking up .env & docker-compose.yml file.\n"
+
+        mkdir ~/backup
+
+        mv ${WORKDIR}/.env ${BACKUPDIR}/.env
+        mv ${WORKDIR}/.env.sample ${BACKUPDIR}/.env.sample
+        mv ${WORKDIR}/docker-compose.yml ${BACKUPDIR}/docker-compose.yml
+
+        # ---------------------------------------
+        # remove public folder & .gitignore file
+
+        rm -rf ${WORKDIR}/public
+        rm ${WORKDIR}/.gitignore
+
+        # ---------------------------------------
+        # create fresh Laravel project into workdir (should be empty)
+
+        printf "\nCreating fresh Laravel project in work directory.\n"
+
+        composer create-project laravel/laravel=5.7.* ${WORKDIR}
+
+        # ---------------------------------------
+        # restore .env & docker-compose.yml file
+
+        printf "\nRestoring .env & docker-compose.yml file.\n"
+
+        mv ${BACKUPDIR}/.env ${WORKDIR}/.env
+        mv ${BACKUPDIR}/.env.sample ${WORKDIR}/.env.sample
+        mv ${BACKUPDIR}/docker-compose.yml ${WORKDIR}/docker-compose.yml
+
+        rmdir ${BACKUPDIR}
+
+        # ---------------------------------------
+        # regenerate app key for restored .env
+
+        php artisan key:generate --ansi
+
+    else
+
+        # if artisan (non-init) command issued...
+        
+        echo "Sorry. This does NOT appear to be a valid Laravel project."
+        echo "To create a fresh project, you may execute: artisan init"
+    fi
+
+else
+
+    # artisan (php file) exist (in workdir), forward command to php artisan
+
+    php artisan "$@"
+fi

@@ -1,0 +1,48 @@
+#!/bin/sh
+set -e
+
+# if PHP timezone setting does not match ENV TZ
+if ! grep -Fxq "date.timezone = ${TZ}" /usr/local/etc/php/php.ini > /dev/null; then
+
+    # update PHP timezone setting accordingly
+    sed -i 's|;*date.timezone = [a-zA-Z/_\-]*|date.timezone = '${TZ}'|g' /usr/local/etc/php/php.ini
+fi
+
+# if XDEBUG ENV is set true
+if [ "${XDEBUG}" = true ]; then
+
+    # if docker-php-ext-xdebug.ini.disabled exists
+    if [ -e /usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini.disabled ]; then
+
+        # rename docker-php-ext-xdebug.ini.disabled to docker-php-ext-xdebug.ini (this will load xdebug extension)
+        mv "/usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini.disabled" "/usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini"
+    fi
+
+    # append config (if missing): xdebug.remote_enable=1
+    if ! grep -q "xdebug.remote_enable=1" /usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini; then
+        echo "xdebug.remote_enable=1" >> /usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini    
+    fi
+
+    # append config (if missing) or update: xdebug.remote_host=(remote host)
+    if ! grep -q "xdebug.remote_host" /usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini; then
+        echo "xdebug.remote_host=${XDEBUG_REMOTE_HOST}" >> /usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini
+    else
+        sed -i "s|xdebug.remote_host=[ a-zA-Z0-9\.]*|xdebug.remote_host=${XDEBUG_REMOTE_HOST}|g" /usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini
+    fi
+
+else
+
+    # if docker-php-ext-xdebug.ini exists
+    if [ -e /usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini ]; then
+
+        # rename docker-php-ext-xdebug.ini to docker-php-ext-xdebug.ini.disabled (this will NOT load xdebug extension)
+        mv "/usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini" "/usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini.disabled"
+    fi
+fi
+
+# first arg is `-f` or `--some-option`
+if [ "${1#-}" != "$1" ]; then
+	set -- php-fpm "$@"
+fi
+
+exec "$@"
