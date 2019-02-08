@@ -1,0 +1,19 @@
+#!/bin/sh
+set -e
+
+# Change nginx site server_name config by SERVER_NAME environment variable
+sed -i 's|server_name[ a-zA-Z0-9\.]*;|server_name  '${SERVER_NAME}';|g' /etc/nginx/conf.d/default.conf
+
+# Nginx php script forwarding (fastcgi_pass) to target container PHP_HOST:9000
+sed -i 's|fastcgi_pass[ 0-9A-Za-z\.\-]*:[0-9]*;|fastcgi_pass   '${PHP_HOST}':9000;|g' /etc/nginx/conf.d/default.conf
+
+# Configure FastCGI send/read timeout (defaulted to 60 seconds)
+sed -i 's|fastcgi_send_timeout[ 0-9]*;|fastcgi_send_timeout '${TIMEOUT}';|g' /etc/nginx/conf.d/default.conf
+sed -i 's|fastcgi_read_timeout[ 0-9]*;|fastcgi_read_timeout '${TIMEOUT}';|g' /etc/nginx/conf.d/default.conf
+
+# first arg is `-f` or `--some-option`
+if [ "${1#-}" != "$1" ]; then
+	set -- nginx "$@"
+fi
+
+exec "$@"
