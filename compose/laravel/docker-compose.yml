@@ -17,7 +17,7 @@ services:
       - php
 
   php:
-    image: faisaladlin/php:7.2-fpm
+    image: faisaladlin/php:7.2-fpm-laravel
     environment:
       XDEBUG: ${XDEBUG}
       XDEBUG_REMOTE_HOST: ${XDEBUG_REMOTE_HOST}

@@ -22,7 +22,7 @@ if [ ! -f artisan ]; then
         mkdir ~/backup
 
         mv ${WORKDIR}/.env ${BACKUPDIR}/.env
-        mv ${WORKDIR}/.env.sample ${BACKUPDIR}/.env.sample
+        mv ${WORKDIR}/.env.example ${BACKUPDIR}/.env.example
         mv ${WORKDIR}/docker-compose.yml ${BACKUPDIR}/docker-compose.yml
 
         # ---------------------------------------
@@ -44,7 +44,7 @@ if [ ! -f artisan ]; then
         printf "\nRestoring .env & docker-compose.yml file.\n"
 
         mv ${BACKUPDIR}/.env ${WORKDIR}/.env
-        mv ${BACKUPDIR}/.env.sample ${WORKDIR}/.env.sample
+        mv ${BACKUPDIR}/.env.example ${WORKDIR}/.env.example
         mv ${BACKUPDIR}/docker-compose.yml ${WORKDIR}/docker-compose.yml
 
         rmdir ${BACKUPDIR}

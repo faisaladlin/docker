@@ -7,12 +7,6 @@ ARG WORKDIR=/var/www
 # Public site directory (may be different from working directory)
 ARG SITEDIR=/var/www/public
 
-# With NodeJS & NPM
-ARG WITH_NODEJS=true
-
-# With artisan ('php artisan' alias for Laravel php projects)
-ARG WITH_ARTISAN=true
-
 # XDebug enable/disable flag
 ENV XDEBUG=false
 
@@ -50,18 +44,11 @@ RUN apk add --no-cache $PHPIZE_DEPS \
 RUN [[ ! -e /usr/local/etc/php/php.ini ]] && cp /usr/local/etc/php/php.ini-development /usr/local/etc/php/php.ini \
     && sed -i 's|;date.timezone =|date.timezone = '$TZ'|g' /usr/local/etc/php/php.ini
 
-# Install npm & nodejs (recommended for server side javascript operations)
-RUN [[ "${WITH_NODEJS}" = true ]] && apk add --no-cache npm
-
 # Replace docker-php-entrypoint which on run:
 # > alters PHP.ini timezone based on TZ ENV variable
 # > enable/disable XDEBUG based on XDEBUG ENV variable
 COPY ./custom/user-bin/docker-php-entrypoint /usr/local/bin/
 RUN chmod +x /usr/local/bin/docker-php-entrypoint
-
-# Adds artisan exec / alias for "php artisan" command
-COPY ./custom/user-bin/artisan /usr/local/bin/
-RUN [[ "${WITH_ARTISAN}" = true ]] && chmod +x /usr/local/bin/artisan || rm /usr/local/bin/artisan
 
 # Configs directory:    /usr/local/etc/php
 # Work directory:       /var/www
