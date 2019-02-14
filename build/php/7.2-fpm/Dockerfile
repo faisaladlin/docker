@@ -25,8 +25,8 @@ WORKDIR $WORKDIR
 RUN [[ ! -d $SITEDIR ]] && mkdir -p $SITEDIR \
     && if [ ! "$SITEDIR" == "/var/www/html" ]; then if [ -d "/var/www/html" ]; then [[ -z "$(ls -A "/var/www/html")" ]] && rmdir /var/www/html; fi; fi
 
-# Install tzdata, common PHP extensions & it's prerequisites
-RUN apk add tzdata libpng-dev libjpeg-turbo-dev freetype-dev \
+# Install git, tzdata, common PHP extensions & it's prerequisites
+RUN apk add git tzdata libpng-dev libjpeg-turbo-dev freetype-dev \
     && docker-php-ext-install bcmath gd opcache pdo_mysql zip
 
 # Install PHP Composer into user bin

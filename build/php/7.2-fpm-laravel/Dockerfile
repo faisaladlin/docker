@@ -1,4 +1,4 @@
-FROM faisaladlin/php:7.2-fpm
+FROM faisaladlin/php:7.2-fpm-iredis
 LABEL maintainer="faisaladlin@gmail.com"
 
 # With NodeJS & NPM
