@@ -22,7 +22,7 @@ ENV TZ=Asia/Kuala_Lumpur
 WORKDIR $WORKDIR
 
 # Create missing site directory & remove /var/www/html (if exists, empty & not SITEDIR)
-RUN [[ ! -d $SITEDIR ]] && mkdir -p $SITEDIR \
+RUN if [ ! -d $SITEDIR ]; then mkdir -p $SITEDIR; fi \
     && if [ ! "$SITEDIR" == "/var/www/html" ]; then if [ -d "/var/www/html" ]; then [[ -z "$(ls -A "/var/www/html")" ]] && rmdir /var/www/html; fi; fi
 
 # Install git, tzdata, common PHP extensions & it's prerequisites

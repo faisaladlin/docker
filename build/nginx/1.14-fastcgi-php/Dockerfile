@@ -36,7 +36,7 @@ ENV TZ=Asia/Kuala_Lumpur
 WORKDIR $WORKDIR
 
 # Create site directory if missing
-RUN [[ ! -d $SITEDIR ]] && mkdir -p $SITEDIR
+RUN if [ ! -d $SITEDIR ]; then mkdir -p $SITEDIR; fi
 
 # Copy contents of /usr/share/nginx/html into site directory (if empty)
 RUN [[ -z "$(ls -A "$SITEDIR")" ]] && cp -R /usr/share/nginx/html/. $SITEDIR
